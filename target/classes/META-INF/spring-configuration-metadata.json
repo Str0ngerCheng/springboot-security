@@ -1,0 +1,11 @@
+{
+  "groups": [
+    {
+      "name": "jwt",
+      "type": "com.sans.common.config.JWTConfig",
+      "sourceType": "com.sans.common.config.JWTConfig"
+    }
+  ],
+  "properties": [],
+  "hints": []
+}

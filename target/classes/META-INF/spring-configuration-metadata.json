@@ -2,8 +2,8 @@
   "groups": [
     {
       "name": "jwt",
-      "type": "com.sans.common.config.JWTConfig",
-      "sourceType": "com.sans.common.config.JWTConfig"
+      "type": "com.swe.common.config.JWTConfig",
+      "sourceType": "com.swe.common.config.JWTConfig"
     }
   ],
   "properties": [],

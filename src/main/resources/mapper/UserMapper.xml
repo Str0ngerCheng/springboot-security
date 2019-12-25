@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.swe.core.dao.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.swe.core.entity.User">
+        <id column="id" property="id" />
+        <result column="sno" property="sno" />
+        <result column="head" property="head" />
+        <result column="nickname" property="nickname" />
+        <result column="sex" property="sex" />
+        <result column="campus" property="campus" />
+        <result column="phone" property="phone" />
+        <result column="status" property="status" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, sno, head, nickname, sex, campus, phone, status
+    </sql>
+
+    <!-- 查询用户的所有权限 -->
+    <select id="selectPermissionByUserId" resultType="com.swe.core.entity.Permission" parameterType="Long">
+		SELECT DISTINCT p.* FROM user_role ur
+			LEFT JOIN role_permission rp ON ur.role_id = rp.role_id
+			LEFT JOIN permission p ON rp.permission_id = p.id
+		WHERE ur.user_id = #{id}
+	</select>
+
+    <!-- 查询用户所有角色 -->
+    <select id="selectRoleByUserId" resultType="com.swe.core.entity.Role" parameterType="Long">
+		SELECT r.* FROM role r
+		LEFT JOIN user_role ur ON ur.role_id = r.id
+		WHERE ur.user_id = #{id}
+	</select>
+</mapper>

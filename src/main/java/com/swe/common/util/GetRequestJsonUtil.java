@@ -10,7 +10,7 @@ import java.io.IOException;
  * @author cbw
  */
 
-public class GetRequestJsonUtils {
+public class GetRequestJsonUtil {
     public static JSONObject getRequestJsonObject(HttpServletRequest request) throws IOException {
         String json = getRequestJsonString(request);
         return JSONObject.parseObject(json);

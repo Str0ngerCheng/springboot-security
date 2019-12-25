@@ -1,7 +1,7 @@
 package com.swe.security.jwt;
 
 import com.alibaba.fastjson.JSONObject;
-import com.swe.common.util.GetRequestJsonUtils;
+import com.swe.common.util.GetRequestJsonUtil;
 import com.swe.security.handler.UserLoginFailureHandler;
 import com.swe.security.handler.UserLoginSuccessHandler;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ public class JWTLoginFilter extends UsernamePasswordAuthenticationFilter {
         String username="";
         String password="";
         try {
-            JSONObject json = GetRequestJsonUtils.getRequestJsonObject(req);
+            JSONObject json = GetRequestJsonUtil.getRequestJsonObject(req);
             username=json.getString("username");
             password=json.getString("password");
         } catch (IOException e) {

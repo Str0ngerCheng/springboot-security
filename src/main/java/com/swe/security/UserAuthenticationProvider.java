@@ -57,7 +57,7 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
         // 查询用户角色
         List<Role> roleList = userService.selectRoleByUserId(userInfo.getUserId());
         for (Role role: roleList){
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getTitle()));
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getTitle()));//权限用role表Title字段存储
         }
         userInfo.setAuthorities(authorities);
         // 进行登录

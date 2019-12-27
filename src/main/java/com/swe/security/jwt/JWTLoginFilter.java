@@ -2,6 +2,7 @@ package com.swe.security.jwt;
 
 import com.alibaba.fastjson.JSONObject;
 import com.swe.common.util.GetRequestJsonUtil;
+import com.swe.security.entity.SelfUserEntity;
 import com.swe.security.handler.UserLoginFailureHandler;
 import com.swe.security.handler.UserLoginSuccessHandler;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,12 +52,8 @@ public class JWTLoginFilter extends UsernamePasswordAuthenticationFilter {
             log.error(e.getMessage());
         }
 
-        return authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        username,
-                        password,
-                        new ArrayList<>())
-        );
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password, new ArrayList<>()));
+        return authentication;
 
     }
 }

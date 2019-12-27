@@ -1,5 +1,7 @@
 package com.swe.security.handler;
 
+import com.swe.common.config.JWTConfig;
+import com.swe.common.util.JWTTokenUtil;
 import com.swe.common.util.ResultUtil;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,9 +25,11 @@ public class UserLogoutSuccessHandler implements LogoutSuccessHandler {
      */
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication){
+        String tokenHeader = request.getHeader(JWTConfig.tokenHeader);
+        JWTTokenUtil.inValidToken(tokenHeader.replace(JWTConfig.tokenPrefix, ""));
         Map<String,Object> resultData = new HashMap<>();
         resultData.put("code","200");
-        resultData.put("msg", "登出成功");
+        resultData.put("msg", "登出成功,Token已失效");
         SecurityContextHolder.clearContext();
         ResultUtil.responseJson(response,ResultUtil.resultSuccess(resultData));
     }

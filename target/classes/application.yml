@@ -9,6 +9,28 @@ spring:
     username: root
     password: swe123
     type: com.alibaba.druid.pool.DruidDataSource
+  # REDIS (RedisProperties)
+  redis:
+    # Redis数据库索引（默认为0）
+    database: 0
+    # Redis服务器地址
+    host: localhost
+    # Redis服务器连接端口
+    port: 6379
+    # Redis服务器连接密码（默认为空）
+    password:
+    # 连接池最大连接数（使用负值表示没有限制）
+    jedis:
+      pool:
+        max-active: 8
+      # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: -1
+      # 连接池中的最大空闲连接
+        max-idle: 8
+      # 连接池中的最小空闲连接
+        min-idle: 0
+      # 连接超时时间（毫秒）
+    timeout: 5000
 
 # JWT配置
 jwt:
@@ -18,9 +40,14 @@ jwt:
   tokenHeader: token
   # Token前缀字符
   tokenPrefix: swe-
-  # 过期时间 单位秒 1天后过期=86400 7天后过期=604800
-  expiration: 86400
+  # accessToken过期时间 单位小时 2小时
+  expiration: 2
+  # refreshToken过期时间 单位小时 15天 15*24=360小时
+  refreshExpiration: 360
   # 配置不需要认证的接口
   antMatchers: /index,/login/**,/login/userLogin,/favicon.ico
+
 mybatis-plus:
   mapper-locations: classpath*:mapper/*.xml
+
+

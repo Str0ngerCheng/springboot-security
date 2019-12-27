@@ -2,6 +2,7 @@ package com.swe.security.jwt;
 
 import com.alibaba.fastjson.JSONObject;
 import com.swe.common.config.JWTConfig;
+import com.swe.common.util.JWTTokenUtil;
 import com.swe.security.entity.SelfUserEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -28,11 +29,11 @@ import java.util.Map;
 /**
  * JWT接口请求校验拦截器
  * 请求接口时会进入这里验证Token是否合法和过期
- * @Author Sans
+ * @Author cbw
  */
 @Slf4j
 public class JWTAuthenticationTokenFilter extends BasicAuthenticationFilter {
-    private Logger log = LoggerFactory.getLogger(this.getClass());
+    private static Logger log = LoggerFactory.getLogger(JWTTokenUtil.class);
 
     public JWTAuthenticationTokenFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
@@ -43,41 +44,34 @@ public class JWTAuthenticationTokenFilter extends BasicAuthenticationFilter {
         // 获取请求头中JWT的Token
         String tokenHeader = request.getHeader(JWTConfig.tokenHeader);
         if (null!=tokenHeader && tokenHeader.startsWith(JWTConfig.tokenPrefix)) {
+            // 截取JWT前缀
+            String token = tokenHeader.replace(JWTConfig.tokenPrefix, "");
+            // 解析JWT
+            SelfUserEntity selfUserEntity =null;
             try {
-                // 截取JWT前缀
-                String token = tokenHeader.replace(JWTConfig.tokenPrefix, "");
-                // 解析JWT
-                Claims claims = Jwts.parser()
-                        .setSigningKey(JWTConfig.secret)
-                        .parseClaimsJws(token)
-                        .getBody();
-                // 获取用户名
-                String username = claims.getSubject();
-                String userId=claims.getId();
-                if(!StringUtils.isEmpty(username)&&!StringUtils.isEmpty(userId)) {
-                    // 获取角色
-                    List<GrantedAuthority> authorities = new ArrayList<>();
-                    String authority = claims.get("authorities").toString();
-                    if(!StringUtils.isEmpty(authority)){
-                        List<Map<String,String>> authorityMap = JSONObject.parseObject(authority, List.class);
-                        for(Map<String,String> role : authorityMap){
-                            if(!StringUtils.isEmpty(role)) {
-                                authorities.add(new SimpleGrantedAuthority(role.get("authority")));
-                            }
-                        }
-                    }
-                    //组装参数
-                    SelfUserEntity selfUserEntity = new SelfUserEntity();
-                    selfUserEntity.setUsername(claims.getSubject());
-                    selfUserEntity.setUserId(Long.parseLong(claims.getId()));
-                    selfUserEntity.setAuthorities(authorities);
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(selfUserEntity, userId, authorities);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
-            } catch (ExpiredJwtException e){
+                Claims claims = JWTTokenUtil.parseToken(token);
+                selfUserEntity= JWTTokenUtil.parseClaims(claims);
+
+            }catch(ExpiredJwtException e){
                 log.info("Token过期");
-            } catch (Exception e) {
+                String newToken=JWTTokenUtil.refreshAccessToken(tokenHeader,e.getClaims());//刷新Token
+                if(newToken!=null){
+                    log.info("生成新的Token");
+                    // 截取JWT前缀
+                    System.out.println(newToken.replace(JWTConfig.tokenPrefix,""));
+                    Claims claims = JWTTokenUtil.parseToken(newToken.replace(JWTConfig.tokenPrefix,""));
+                    selfUserEntity=JWTTokenUtil.parseClaims(claims);
+                    //添加到响应头中 以供前端存储
+                    response.setHeader("newToken", newToken);
+                    response.addHeader("Access-Control-Expose-Headers", "newToken");
+                    response.setCharacterEncoding("UTF-8");
+                }
+            } catch(Exception e){
                 log.info("Token无效");
+            }
+            if(selfUserEntity!=null) {
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(selfUserEntity, selfUserEntity.getPassword(), selfUserEntity.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
         filterChain.doFilter(request, response);

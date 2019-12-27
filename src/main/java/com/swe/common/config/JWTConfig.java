@@ -25,9 +25,13 @@ public class JWTConfig {
      */
     public static String tokenPrefix;
     /**
-     * 过期时间
+     * accessToken过期时间
      */
     public static Integer expiration;
+    /**
+     * refreshToken过期时间
+     */
+    public static Integer refreshExpiration;
     /**
      * 不需要认证的接口
      */
@@ -47,10 +51,13 @@ public class JWTConfig {
     }
 
     public void setExpiration(Integer expiration) {
-        this.expiration = expiration * 1000;
+        this.expiration = expiration*60*60*1000;
     }
+    public  void setRefreshExpiration(Integer refreshExpiration) { JWTConfig.refreshExpiration = refreshExpiration*60*60*1000; }
 
     public void setAntMatchers(String antMatchers) {
         this.antMatchers = antMatchers;
     }
+
+
 }

@@ -31,8 +31,7 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication){
         // 组装JWT
         SelfUserEntity selfUserEntity =  (SelfUserEntity) authentication.getPrincipal();
-        String token = JWTTokenUtil.createAccessToken(selfUserEntity);
-        token = JWTConfig.tokenPrefix + token;
+        String token = JWTTokenUtil.create2Token(selfUserEntity);
         // 封装返回参数
         Map<String,Object> resultData = new HashMap<>();
         resultData.put("code","200");
